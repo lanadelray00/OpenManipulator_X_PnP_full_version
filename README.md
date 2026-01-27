@@ -1,3 +1,8 @@
+> **⚠️ Default branch: ROS 2 Humble**
+>  
+> This `main` branch is based on **ROS 2 Humble Hawksbill**.  
+> For ROS 2 Jazzy, please switch to the `jazzy` branch.
+
 # 📌 Project Overview
 
 This repository implements an OpenManipulator-X Pick & Place system based on
