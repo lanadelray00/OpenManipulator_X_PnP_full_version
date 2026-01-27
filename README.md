@@ -29,6 +29,54 @@ Motion Planning: MoveIt 2
 
 Hardware: Manipulator, Logitech C270
 
+## 🧩 Execution Instructions (RSBP & Control PC)
+
+## Prerequisite
+
+1. Set the same ROS domain ID to `.bashrc' : ```export ROS_DOMAIN_ID=XX```
+
+### Humble
+
+* Since an actual RSBP4 device was not available, this setup has not been physically verified.
+However, it is expected to work correctly by running the bringup on the RSBP4 and the control-related launch files on the control PC.
+
+1. Install ROS 2 and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
+
+2. On the RSBP4, clone the Humble branch of the following repository:
+   https://github.com/ROBOTIS-GIT/open_manipulator.git
+
+   Keep only the bringup and description packages, remove the rest, and build the workspace
+   (only the hardware launch file from bringup is required).
+ 3. On the control PC, clone the Humble branch of the following repository and build it:https://github.com/lanadelray00/OpenManipulator_X_PnP_full_version.git
+
+Terminal Execution
+```
+# RSBP4
+ros2 launch open_manipulator_x_bringup hardware.launch.py
+
+# Control PC
+ros2 launch open_manipulator_x_moveit_config move_group.launch.py
+ros2 launch openmanipulator_task_executor pickandplace_bringup.launch.py
+ros2 launch openmanipulator_task_executor keyboard_trigger_node.py
+```
+### Jazzy
+
+1. Install ROS 2 and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
+2. On the RSBP5, clone the Jazzy branch of the following repository:https://github.com/ROBOTIS-GIT/open_manipulator.git
+   Keep only the bringup and description packages, remove the rest, and build the workspace (only the hardware launch file from bringup is required).
+ 3. On the control PC, clone the Jazzy branch of the following repository and build it:https://github.com/lanadelray00/OpenManipulator_X_PnP_full_version.git
+
+Terminal Execution
+```
+# RSBP5
+ros2 launch open_manipulator_bringup open_manipulator_x.launch.py
+
+# Control PC
+ros2 launch open_manipulator_moveit_config open_manipulator_x_moveit.launch.py
+ros2 launch openmanipulator_task_executor pickandplace_bringup.launch.py
+ros2 launch openmanipulator_task_executor keyboard_trigger_node.py
+```
+
 ## 🧠 System Architecture
 
 ### 1️⃣ robot_interface.cpp
