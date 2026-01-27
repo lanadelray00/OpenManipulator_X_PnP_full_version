@@ -17,13 +17,13 @@ https://youtu.be/JyPYKrjtD1M
 
 ## ✅ Implementation Environment
 
-OS: Ubuntu 22.04 LTS, Ubuntu 24.04 LTS
+OS: Ubuntu 22.04 LTS / Ubuntu 24.04 LTS
 
-ROS 2: Humble, Jazzy
+ROS 2: Humble / Jazzy
 
 Language: Python + Cpp
 
-Vision: OpenCV, ArUco
+Vision: OpenCV, ArUco Marker
 
 Motion Planning: MoveIt 2
 
