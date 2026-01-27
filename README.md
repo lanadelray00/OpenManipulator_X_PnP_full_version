@@ -17,9 +17,9 @@ https://youtu.be/JyPYKrjtD1M
 
 ## ✅ Implementation Environment
 
-OS: Ubuntu 22.04 LTS (Jammy)
+OS: Ubuntu 22.04 LTS, Ubuntu 24.04 LTS
 
-ROS 2: Humble Hawksbill
+ROS 2: Humble, Jazzy
 
 Language: Python + Cpp
 
@@ -27,7 +27,11 @@ Vision: OpenCV, ArUco
 
 Motion Planning: MoveIt 2
 
-Hardware: Manipulator, Logitech C270
+Manipulator model : OpenManipulator-X
+
+Camera : Logitech C270
+
+
 
 ## 🧩 Execution Instructions (RSBP & Control PC)
 
