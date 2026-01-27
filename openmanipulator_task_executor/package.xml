@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-model href="WIP" schematypens="WIP"?>
+<package format="3">
+  <name>openmanipulator_task_executor</name>
+  <version>0.0.0</version>
+  <description>
+    This package provides an example for utilizing the MoveIt API with the OpenMANIPULATOR-X,
+    allowing users to practice and experiment freely.
+  </description>
+  <maintainer email="choigh0396@gmail.com">choi</maintainer>
+  <license>Apache-2.0</license>
+  <author email="choigh0396@gmail.com">WIP</author>
+
+  <!-- Build tools -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <!-- Dependencies -->
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
+  <depend>moveit_ros_planning_interface</depend>
+  <depend>rclcpp_action</depend>        
+  <depend>control_msgs</depend>         
+  <depend>std_srvs</depend>
+  <depend>tf_transformations</depend>
+  <depend>pnp_interfaces</depend>
+
+  <!-- Testing -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

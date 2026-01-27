@@ -1,0 +1,12 @@
+# Goal
+string name       # home / init
+float64 velocity_scaling
+float64 acceleration_scaling
+---
+# Result
+bool success
+int32 error_code
+string message
+---
+# Feedback
+string state
