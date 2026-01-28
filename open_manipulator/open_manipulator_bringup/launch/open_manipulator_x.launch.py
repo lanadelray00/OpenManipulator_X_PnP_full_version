@@ -184,6 +184,13 @@ def generate_launch_description():
         condition=IfCondition(start_rviz),
     )
 
+    flask_cam_node = Node(
+        package='open_manipulator_bringup',
+        executable='flask_cam_node.py',
+        name='flask_camera',
+        output='screen',
+    )    
+
     # Event handlers to ensure order of execution
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -206,5 +213,6 @@ def generate_launch_description():
             robot_state_publisher_node,
             delay_rviz_after_joint_state_broadcaster_spawner,
             delay_joint_trajectory_executor_after_controllers,
+            flask_cam_node,
         ]
     )

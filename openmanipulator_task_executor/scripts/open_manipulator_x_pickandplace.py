@@ -38,7 +38,7 @@ class PickAndPlaceNode(Node):
         self.processor = MarkerPoseProcessor(self.robot)
 
         # Camera
-        url = "http://192.168.0.101:5000/video_feed"
+        url = "http://192.168.0.101:5000/video_feed" # http://localhost:5000/video_feed
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
         if not self.cap.isOpened():
             self.get_logger().error("Camera open failed")
@@ -116,7 +116,7 @@ class PickAndPlaceNode(Node):
         if not success:
             self.get_logger().error("❌ Move to target failed")
             return
-        self.robot.gripper_and_wait(-0.004)
+        self.robot.gripper_and_wait(-0.005)
 
         # Place
         self.robot.move_to_joint_pose_and_wait(self.JOINT_POSES["pick_up"]) # up
