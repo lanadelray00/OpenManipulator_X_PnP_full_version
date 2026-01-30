@@ -49,14 +49,17 @@ Camera : Logitech C270
 * Since an actual RSBP4 device was not available, this setup has not been physically verified.
 However, it is expected to work correctly by running the bringup on the RSBP4 and the control-related launch files on the control PC.
 
-1. Install ROS 2 and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
+##### RSBP4
+1. Install ros-humble-ros-base and ros-dev-tools on the RSBP4 and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
+2. Keep only the bringup and description packages, remove the rest, and build the workspace with 'colcon build --symlink-install' (only the hardware launch file from bringup is required).
 
-2. On the RSBP4, clone the Humble branch of the following repository:
-   https://github.com/ROBOTIS-GIT/open_manipulator.git
+   
+##### Control PC
+1. Install ros-humble-desktop and ros-dev-tools on the control pc and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
+2. When you have reached ' <img width="316" height="46" alt="image" src="https://github.com/user-attachments/assets/29aa078b-a6bd-4cdd-bc6d-d2c5116a4cd9" /> ' , instead of cloning ' <img width="885" height="103" alt="image" src="https://github.com/user-attachments/assets/62e0a280-8644-4827-89df-12ed8edb883e" /> ' , clone humble branch of this repository
+3. Check the self.cap = cv2.VideoCapture('/dev/camera_c270') line in open_manipulator_x_pickandplace.py and update it to match your camera device.
+4. build the workspace with 'colcon build --symlink-install'
 
-   Keep only the bringup and description packages, remove the rest, and build the workspace
-   (only the hardware launch file from bringup is required).
- 3. On the control PC, clone the Humble branch of the following repository and build it:https://github.com/lanadelray00/OpenManipulator_X_PnP_full_version.git
 
 Terminal Execution
 ```
@@ -70,10 +73,18 @@ ros2 launch openmanipulator_task_executor keyboard_trigger_node.py
 ```
 ### Jazzy
 
-1. Install ROS 2 and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
-2. On the RSBP5, clone the Jazzy branch of the following repository:https://github.com/ROBOTIS-GIT/open_manipulator.git
-   Keep only the bringup and description packages, remove the rest, and build the workspace (only the hardware launch file from bringup is required).
- 3. On the control PC, clone the Jazzy branch of the following repository and build it:https://github.com/lanadelray00/OpenManipulator_X_PnP_full_version.git
+##### RSBP4
+1. Install ros-jazzy-ros-base and ros-dev-tools on the RSBP4 and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
+2. Keep only the bringup and description packages, remove the rest, and build the workspace with 'colcon build --symlink-install' (only the hardware launch file from bringup is required).
+
+   
+##### Control PC
+1. Install ros-jazzy-desktop and ros-dev-tools on the control pc and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
+2. When you have reached ' <img width="319" height="40" alt="image" src="https://github.com/user-attachments/assets/3a5c93e2-c371-4442-bdf5-7c97a9d797f1" />
+ ' , instead of cloning ' <img width="872" height="105" alt="image" src="https://github.com/user-attachments/assets/bdf4b4c9-b80a-4d19-8b98-2f12ec8de09a" />
+ ' , clone jazzy branch of this repository
+3. Check the self.cap = cv2.VideoCapture('/dev/camera_c270') line in open_manipulator_x_pickandplace.py and update it to match your camera device.
+4. build the workspace with 'colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release'
 
 Terminal Execution
 ```
