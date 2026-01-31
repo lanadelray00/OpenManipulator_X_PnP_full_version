@@ -98,7 +98,7 @@ void RobotInterface::executeMoveToPose(
   arm_group_->setPoseTarget(goal->target_pose);
   applyMotionScaling(goal->velocity_scaling, goal->acceleration_scaling);
   arm_group_->setGoalPositionTolerance(0.01);
-  arm_group_->setGoalOrientationTolerance(0.01);
+  arm_group_->setGoalOrientationTolerance(0.2);
   arm_group_->setPlanningTime(5.0);
 
   // 2. Planning

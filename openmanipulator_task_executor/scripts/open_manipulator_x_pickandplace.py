@@ -38,6 +38,8 @@ class PickAndPlaceNode(Node):
         self.processor = MarkerPoseProcessor(self.robot)
 
         # Camera
+        # url = "http://192.168.0.105:5000/video_feed" # http://localhost:5000/video_feed
+        # self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
         self.cap = cv2.VideoCapture('/dev/camera_c270')
         if not self.cap.isOpened():
             self.get_logger().error("Camera open failed")
@@ -81,10 +83,12 @@ class PickAndPlaceNode(Node):
 
     # Main P&P control loop (30 Hz trigger-based execution)
     def loop(self):
-        if not self.start_requested:
+        if not self.start_requested or self.is_executing:
             return
-        if self.is_executing:
-            return
+        
+        # if not self.processor.is_ready():
+        #     self.get_logger().info("...waiting marker pose ready...")
+        #     return
         
         if self.processor.is_ready():
             self.start_requested = False
