@@ -36,7 +36,8 @@ setup(
             glob('config/omx_l_leader_ai/*')),
         (os.path.join('share', package_name, 'worlds'), glob('worlds/*')),
         (os.path.join('share', package_name), ['open-manipulator-cdc.rules']),
-
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.*')),
+        (os.path.join('lib', package_name), glob('scripts/*.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
