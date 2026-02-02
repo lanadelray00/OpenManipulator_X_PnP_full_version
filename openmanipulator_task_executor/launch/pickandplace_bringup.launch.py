@@ -1,14 +1,29 @@
+import os
 from launch import LaunchDescription
+from ament_index_python.packages import get_package_share_directory
+import yaml
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessStart
 from launch_ros.actions import Node
 
 def generate_launch_description():
 
+    # kinematics yaml
+    kinematics_yaml_path = os.path.join(
+        get_package_share_directory('open_manipulator_moveit_config'),
+        'config',
+        'kinematics.yaml',
+    )
+    with open(kinematics_yaml_path, 'r') as file:
+        kinematics_yaml = yaml.safe_load(file)
+
     robot_interface_node = Node(
         package='openmanipulator_task_executor',
         executable='robot_interface',
-        output='screen'
+        output='screen',
+        parameters=[
+            {'robot_description_kinematics': kinematics_yaml}
+            ]
     )
 
     pick_and_place_node = Node(
