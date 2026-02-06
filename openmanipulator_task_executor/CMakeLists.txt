@@ -31,10 +31,9 @@ find_package(moveit_ros_planning_interface REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pnp_interfaces REQUIRED)
-find_package(moveit_ros_planning_interface REQUIRED)
 
 ################################################################################
-# Include cpp header directory
+# Include cpp "Header" directory
 ################################################################################
 include_directories(include)
 
@@ -48,15 +47,14 @@ add_executable(robot_interface src/robot_interface.cpp)
 ################################################################################
 # Export header include paths
 ################################################################################
-target_include_directories(robot_interface PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+# target_include_directories(robot_interface PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>)
 
 ################################################################################
 # Declare ROS 2/MoveIt dependencies (headers, libraries, and runtime linking)
 ################################################################################
-ament_target_dependencies(
-  robot_interface
+ament_target_dependencies(robot_interface
   "moveit_ros_planning_interface"
   "rclcpp"
   "rclcpp_action"
@@ -89,7 +87,7 @@ ament_target_dependencies(
 # )
 
 ################################################################################
-# Install 
+# Install cpp, python executable
 ################################################################################
 # cpp executable
 install(TARGETS robot_interface
@@ -98,7 +96,7 @@ install(TARGETS robot_interface
   DESTINATION lib/${PROJECT_NAME})
 
 # python modules
-# ament_python_install_package(${PROJECT_NAME})
+ament_python_install_package(${PROJECT_NAME})
 
 # python executables
 install(PROGRAMS
@@ -119,6 +117,19 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+################################################################################
+# BUILD_TESTING
+################################################################################
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # uncomment the line when a copyright and license is not present in all source files
+  #set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # uncomment the line when this package is not in a git repo
+  #set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 ################################################################################
 # Macro for ament package
 ################################################################################

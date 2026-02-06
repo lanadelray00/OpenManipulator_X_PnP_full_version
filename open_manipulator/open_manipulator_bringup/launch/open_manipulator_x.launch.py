@@ -186,7 +186,7 @@ def generate_launch_description():
 
     flask_cam_node = Node(
         package='open_manipulator_bringup',
-        executable='flask_cam_node.py',
+        executable='flask_cam_node',
         name='flask_camera',
         output='screen',
     )    

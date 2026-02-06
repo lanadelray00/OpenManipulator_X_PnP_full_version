@@ -85,22 +85,45 @@ class MarkerPoseProcessor:
     # ======================================================
     def process_frame(self, frame):
         
+        frame = np.ascontiguousarray(frame)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        corners, ids, _ = aruco.detectMarkers(
-            gray, self.aruco_dict, parameters=self.parameters
-        )
+
+        detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.parameters)
+        corners, ids, _ = detector.detectMarkers(gray)
 
         if ids is None:
             return
+        
+        rvecs = []
+        tvecs = []
 
-        rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(
-            corners,
-            self.marker_length,
-            self.camera_matrix,
-            self.dist_coeffs
-        )
+        # ArUco marker 3D 기준점 (marker_length 기준)
+        objp = np.array([
+            [-self.marker_length/2,  self.marker_length/2, 0],
+            [ self.marker_length/2,  self.marker_length/2, 0],
+            [ self.marker_length/2, -self.marker_length/2, 0],
+            [-self.marker_length/2, -self.marker_length/2, 0],
+        ], dtype=np.float32)
+        
+        for i, corner in enumerate(corners):
+            img_points = corner.reshape(4, 2).astype(np.float32)
 
-        for i in range(len(ids)):
+            success, rvec, tvec = cv2.solvePnP(
+                objp,
+                img_points,
+                self.camera_matrix,
+                self.dist_coeffs,
+                flags=cv2.SOLVEPNP_IPPE_SQUARE
+            )
+
+            if success:
+                rvecs.append(rvec)
+                tvecs.append(tvec)
+
+        rvecs = np.array(rvecs)
+        tvecs = np.array(tvecs)
+
+        for i in range(len(tvecs)):
             aruco.drawDetectedMarkers(frame, corners, ids)
             cv2.drawFrameAxes(frame, self.camera_matrix, self.dist_coeffs, rvecs[i], tvecs[i], self.marker_length)
 

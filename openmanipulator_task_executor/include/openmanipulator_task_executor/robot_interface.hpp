@@ -10,7 +10,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "control_msgs/action/gripper_command.hpp"
 
-#include "moveit/move_group_interface/move_group_interface.h"
+#include "moveit/move_group_interface/move_group_interface.hpp"
 
 #include "pnp_interfaces/action/move_to_pose.hpp"
 #include "pnp_interfaces/action/move_to_joint_pose.hpp"

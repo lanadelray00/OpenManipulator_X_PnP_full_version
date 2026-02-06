@@ -23,8 +23,12 @@ from robot_interface_client import RobotInterfaceClient
 
 def run_aruco_detector(stop_event, shared_data, robot):
     # openCV & ArUco_marker initialization
-    # cv2.setLogLevel(0)
+    cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
     cap = cv2.VideoCapture('/dev/camera_c270')
+
+    # url = "http://192.168.0.33:5000/video_feed" # http://localhost:5000/video_feed
+    # cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
+    robot.get_logger().info(f"isOpened={cap.isOpened()}")
 
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
     parameters = aruco.DetectorParameters()
@@ -60,12 +64,42 @@ def run_aruco_detector(stop_event, shared_data, robot):
         ret, frame = cap.read()
         if not ret:
             continue
-
+        
+        frame = np.ascontiguousarray(frame)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        corners, ids, rejected = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+
+        detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+        corners, ids, _ = detector.detectMarkers(gray)
  
         if ids is not None:
-            rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, camera_matrix, dist_coeffs)
+            rvecs = []
+            tvecs = []
+
+            # ArUco marker 3D 기준점 (marker_length 기준)
+            objp = np.array([
+                [-marker_length/2,  marker_length/2, 0],
+                [ marker_length/2,  marker_length/2, 0],
+                [ marker_length/2, -marker_length/2, 0],
+                [-marker_length/2, -marker_length/2, 0],
+            ], dtype=np.float32)
+            
+            for i, corner in enumerate(corners):
+                img_points = corner.reshape(4, 2).astype(np.float32)
+
+                success, rvec, tvec = cv2.solvePnP(
+                    objp,
+                    img_points,
+                    camera_matrix,
+                    dist_coeffs,
+                    flags=cv2.SOLVEPNP_IPPE_SQUARE
+                )
+
+                if success:
+                    rvecs.append(rvec)
+                    tvecs.append(tvec)
+
+            rvecs = np.array(rvecs)
+            tvecs = np.array(tvecs)
 
             for i in range(len(ids)):
                 aruco.drawDetectedMarkers(frame, corners, ids)
