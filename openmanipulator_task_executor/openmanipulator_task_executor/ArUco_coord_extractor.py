@@ -57,7 +57,6 @@ class MarkerPoseProcessor:
     # Trigger
     # ======================================================
     def start_recording(self):
-        # buffer clear 명시
         if self.recording:
             return
         self.buffer.clear()
