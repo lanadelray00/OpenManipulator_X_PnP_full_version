@@ -20,7 +20,7 @@ class PickAndPlaceNode(Node):
     }
 
     POSITION_OFFSET = {
-        "x": 0.01,
+        "x": -0.01,
         "y": 0.01,
         "z": -0.01,
     }
@@ -42,11 +42,14 @@ class PickAndPlaceNode(Node):
         # ======================================================
         # State flags
         # ======================================================
-        self.step_mode = True # (True, 단계별 실행) <-> (False, 전체 자동 실행) 결정
-        self.start_requested = False
-        self.is_executing = False # trigger_cb 용 
-        self.action_in_progress = False
-        self.current_stage = "idle"   # [MODIFIED] 상태 머신용
+        self.step_mode = False # (True, 단계별 실행) <-> (False, 전체 자동 실행) 결정
+        self.start_requested = False # state machine 시퀀스용
+        self.is_executing = False # trigger_cb 작동 방지용
+        self.auto_advance = False     # 내부 자동 진행용
+        self.action_in_progress = False  # loop 잠금 용
+        self.initializing = True # 초기화 플래그
+        self.current_stage = None   # [MODIFIED] 상태 머신용
+        self.wait_log_printed = False # Waiting for markers (count limited)
 
         # ======================================================
         # Marker Processor
@@ -56,7 +59,7 @@ class PickAndPlaceNode(Node):
         # ======================================================
         # Camera
         # ======================================================
-        cv2.setLogLevel(cv2.LOG_LEVEL_ERROR)
+        # cv2.setLogLevel(cv2.LOG_LEVEL_ERROR)
         cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
         url = "http://192.168.0.105:5000/video_feed" # 집
         # url = "http://192.168.0.33:5000/video_feed" # 학원
@@ -85,13 +88,17 @@ class PickAndPlaceNode(Node):
             10
         )
 
+        # Notification
         self.get_logger().info("🟢 Pick & Place node started")
         self.get_logger().info("👉 Waiting for /pick_and_place/start trigger")
+        mode_str = "STEP MODE" if self.step_mode else "AUTO MODE"
+        self.get_logger().info(f"🔍 processor.is_ready(): {mode_str}")
+
 
         # ======================================================
         # Startup motion (ASYNC)
         # ======================================================
-        self.send_joint_pose(self.JOINT_POSES["ground_10"], next_stage="idle")
+        self.send_joint_pose(self.JOINT_POSES["ground_10"], next_stage=None)
 
     # ======================================================
     # Trigger
@@ -119,24 +126,38 @@ class PickAndPlaceNode(Node):
     def loop(self):
         if self.action_in_progress:
             return
+
         # ===============================
         # STEP MODE (단계별 실행)
         # ===============================
         if self.step_mode:
-            if self.start_requested:
+            # self.processor.start_recording() true 기다림
+            if self.current_stage == "pick" and self.is_executing:
+                self.execute_next_stage()
+            elif self.start_requested:
                 self.start_requested = False
                 self.is_executing = True
-                self.execute_next_stage()   # ✅ FSM 진입은 여기 한 곳뿐
+                self.execute_next_stage()
 
         # ===============================
         # AUTO MODE (전체 자동 실행)
         # ===============================
         else:
-            if self.start_requested:
+
+            # 최초 시작 (idle → pick_open)
+            if self.start_requested and not self.is_executing:
                 self.start_requested = False
                 self.is_executing = True
                 self.execute_next_stage()
-            elif self.is_executing:
+
+            # self.processor.start_recording() true 기다림
+            elif self.current_stage == "pick" and self.is_executing:
+                self.execute_next_stage()
+
+            # 이후 자동 진행 (action 완료 후)
+            elif self.auto_advance:
+                self.auto_advance = False
+                self.is_executing = True
                 self.execute_next_stage()
 
     # ======================================================
@@ -150,12 +171,14 @@ class PickAndPlaceNode(Node):
             return
 
         if self.current_stage == "pick_open":
+            self.processor.start_recording()
             self.get_logger().info("🟢gripper open")
             self.send_gripper(0.019, next_stage="pick")
         
         elif self.current_stage == "pick":
-            self.get_logger().info("🟢pick")
-            self.processor.start_recording()
+            if not self.wait_log_printed:
+                self.get_logger().info("🟢pick")
+                self.wait_log_printed = True
             self.execute_pick(next_stage="grip")
 
         elif self.current_stage == "grip":
@@ -197,25 +220,28 @@ class PickAndPlaceNode(Node):
     # Pick
     # ======================================================
     def execute_pick(self, next_stage):
-        self.action_in_progress = True
-
-        if self.processor.is_ready():
-            self.target_pose = self.processor.get_refined_pose()
-            x, y, z, qx, qy, qz, qw = self.target_pose
-            x += self.POSITION_OFFSET["x"]
-            y += self.POSITION_OFFSET["y"]
-            z += self.POSITION_OFFSET["z"]
-
-            self.get_logger().info(f"🎯 Target pose: {x:.3f}, {y:.3f}, {z:.3f}")
-            future = self.robot.send_move_to_pose(x, y, z, qx, qy, qz, qw)
-
-            future.add_done_callback(
-                lambda f: self.on_action_done(next_stage)
-            )
-        else:
-            self.get_logger().info("⏳ waiting for marker...")
-            self.action_in_progress = False
+        if self.action_in_progress:
             return
+
+        if not self.processor.is_ready():
+            if not self.wait_log_printed:
+                self.get_logger().info("⏳ waiting for marker...")
+                self.wait_log_printed = True
+            return
+
+        self.wait_log_printed = False
+        self.action_in_progress = True
+        self.target_pose = self.processor.get_refined_pose()
+        x, y, z, qx, qy, qz, qw = self.target_pose
+        x += self.POSITION_OFFSET["x"]
+        y += self.POSITION_OFFSET["y"]
+        z += self.POSITION_OFFSET["z"]
+        self.get_logger().info(f"🎯 Target pose: {x:.3f}, {y:.3f}, {z:.3f}")
+
+        future = self.robot.send_move_to_pose(x, y, z, qx, qy, qz, qw)
+        future.add_done_callback(
+            lambda f: self.on_action_done(next_stage)
+        )
 
 
     # ======================================================
@@ -235,8 +261,22 @@ class PickAndPlaceNode(Node):
 
     def on_action_done(self, next_stage):
         self.action_in_progress = False
-        self.is_executing = False
+
+        # 초기자세 완료 처리
+        if self.initializing:
+            self.initializing = False
+            self.current_stage = "idle"
+            self.get_logger().info("🟢 Initial pose ready, FSM idle")
+            return
+        
+        # ===== FSM normal flow =====
         self.current_stage = next_stage
+
+        if self.step_mode:
+            self.is_executing = False
+        else:
+            self.is_executing = False
+            self.auto_advance = True
 
     # ======================================================
     # Shutdown
