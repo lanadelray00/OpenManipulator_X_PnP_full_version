@@ -11,6 +11,7 @@ def main():
 
     # === 카메라 선택 (하나만 사용) ===
     cap = cv2.VideoCapture('/dev/camera_c270')
+    # cap = cv2.VideoCapture("http://192.168.0.105:5000/video_feed", cv2.CAP_FFMPEG)
     # cap = cv2.VideoCapture("http://192.168.0.33:5000/video_feed", cv2.CAP_FFMPEG)
 
     print("isOpened:", cap.isOpened())

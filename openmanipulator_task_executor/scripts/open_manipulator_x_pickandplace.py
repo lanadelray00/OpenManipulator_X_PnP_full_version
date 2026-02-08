@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
 import cv2
 from std_msgs.msg import Bool
 import threading
 
-# from robot_interface_client import RobotInterfaceClient
-# from ArUco_coord_extractor import MarkerPoseProcessor
 from openmanipulator_task_executor.robot_interface_client import RobotInterfaceClient
 from openmanipulator_task_executor.ArUco_coord_extractor import MarkerPoseProcessor
 
@@ -57,8 +56,11 @@ class PickAndPlaceNode(Node):
         # ======================================================
         # Camera
         # ======================================================
+        cv2.setLogLevel(cv2.LOG_LEVEL_ERROR)
         cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
-        url = "http://192.168.0.33:5000/video_feed"
+        url = "http://192.168.0.105:5000/video_feed" # 집
+        # url = "http://192.168.0.33:5000/video_feed" # 학원
+
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
 
         if not self.cap.isOpened():

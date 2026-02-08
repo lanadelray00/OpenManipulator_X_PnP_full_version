@@ -23,7 +23,7 @@ from robot_interface_client import RobotInterfaceClient
 
 def run_aruco_detector(stop_event, shared_data, robot):
     # openCV & ArUco_marker initialization
-    cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
+    # cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
     cap = cv2.VideoCapture('/dev/camera_c270')
 
     # url = "http://192.168.0.33:5000/video_feed" # http://localhost:5000/video_feed
