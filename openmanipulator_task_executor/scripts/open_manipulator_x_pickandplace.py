@@ -33,12 +33,6 @@ class PickAndPlaceNode(Node):
         # ======================================================
         self.robot = RobotInterfaceClient(self)
 
-        # [REMOVED]
-        # success = self.robot.move_to_joint_pose_and_wait(...)
-        # 이유:
-        #   helper에는 blocking API가 없고,
-        #   노드에서 비동기 시퀀스로 처리해야 함
-
         # ======================================================
         # State flags
         # ======================================================
@@ -61,14 +55,14 @@ class PickAndPlaceNode(Node):
         # ======================================================
         # cv2.setLogLevel(cv2.LOG_LEVEL_ERROR)
         cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
-        url = "http://192.168.0.105:5000/video_feed" # 집
-        # url = "http://192.168.0.33:5000/video_feed" # 학원
+        # url = "http://192.168.0.105:5000/video_feed" # 집
+        url = "http://192.168.0.101:5000/video_feed" # 학원
 
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
-
-        if not self.cap.isOpened():
-            self.get_logger().error("Camera open failed")
-            raise RuntimeError("Camera open failed")
+        
+        ret, _ = self.cap.read()
+        if not ret:
+            raise RuntimeError("Camera open failed!!!!")
 
         self.camera_running = True
         threading.Thread(target=self.camera_loop, daemon=True).start()
