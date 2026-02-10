@@ -56,7 +56,7 @@ class PickAndPlaceNode(Node):
         # cv2.setLogLevel(cv2.LOG_LEVEL_ERROR)
         cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
         # url = "http://192.168.0.105:5000/video_feed" # 집
-        url = "http://192.168.0.101:5000/video_feed" # 학원
+        url = "http://192.168.0.9:5000/video_feed" # 학원
 
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
         
