@@ -56,7 +56,7 @@ class PickAndPlaceNode(Node):
         # cv2.setLogLevel(cv2.LOG_LEVEL_ERROR)
         cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
         # url = "http://192.168.0.105:5000/video_feed" # 집
-        url = "http://192.168.0.101:5000/video_feed" # 학원
+        url = "http://192.168.0.11:5000/video_feed" # 학원
 
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
         
@@ -111,8 +111,8 @@ class PickAndPlaceNode(Node):
             if not ret:
                 continue
             self.processor.process_frame(frame)
-            cv2.imshow("camera", frame)
-            cv2.waitKey(1)
+            # cv2.imshow("camera", frame)                # for_rsbp: GUI disabled for headless execution
+            # cv2.waitKey(1)                             # for_rsbp: GUI disabled for headless execution
 
     # ======================================================
     # Main loop (state driven)
@@ -278,7 +278,7 @@ class PickAndPlaceNode(Node):
     def destroy(self):
         self.camera_running = False
         self.cap.release()
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()                      # for_rsbp: GUI disabled for headless execution
         self.destroy_node()
 
 

@@ -118,6 +118,6 @@ def generate_launch_description():
         declared_arguments
         + [
             move_group_node,
-            rviz_node,
+            # rviz_node,                 # for_rsbp: RViz is disabled for Raspberry Pi (headless runtime)
         ]
     )
