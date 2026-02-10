@@ -212,7 +212,7 @@ def generate_launch_description():
             robot_controller_spawner,
             robot_state_publisher_node,
             delay_rviz_after_joint_state_broadcaster_spawner,
-            delay_joint_trajectory_executor_after_controllers,
+            # delay_joint_trajectory_executor_after_controllers,
             flask_cam_node,
         ]
     )
