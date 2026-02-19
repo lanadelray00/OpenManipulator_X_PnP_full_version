@@ -1,0 +1,20 @@
+* [33mc8c5400[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mjazzy[m[33m, [m[1;31morigin/jazzy-dev[m[33m, [m[1;31morigin/jazzy[m[33m, [m[1;32mjazzy-dev[m[33m)[m minor revision to open_manipulator_x_pickandplace.py
+* [33m45d3dd7[m open_manipulator_x_pickandplace.py-minor revision
+* [33m9407d6b[m Clean up unused files
+* [33m86faa2b[m Implement FSM-based pick and place with auto/step execution modes
+* [33m598aec0[m minor revision at open_manipulator_x_pickandplace.py
+* [33m185bebf[m jazzy-dev: update aruco extractor and pick-and-place logic
+* [33mcea0b05[m jazzy-dev: ongoing refactor and experiments
+* [33m51c3946[m Add Dynamixel packages and fix pick-and-place launch
+* [33m4c88de7[m Revise installation instructions for RSBP4 and Control PC
+* [33m718d72e[m Add Flask camera as a bringup node on RPi
+* [33m912a5f2[m feat(jazzy): vendor OpenManipulator stack (no submodules)
+* [33md635d4b[m feat(jazzy): initial Jazzy-compatible OpenManipulator PnP stack
+* [33m615d1f4[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Improve PnP accuracy: add kinematics.yaml params and increase orientation tolerance (0.01 -> 0.2)
+* [33mf153342[m Revise setup instructions for RSBP4 and Control PC
+* [33m0624536[m Update README with default branch information
+* [33ma143f5a[m Update README formatting for implementation environment
+* [33mde66a29[m Revise implementation environment in README
+* [33m65357dd[m Update README.md
+* [33m4e82f9e[m move git root to src and expose ROS2 packages
+* [33mb17c538[m Initial commit: full OpenManipulator_X_PnP version with integrated packages

@@ -7,6 +7,8 @@ import tf_transformations
 from ament_index_python.packages import get_package_share_directory
 import os
 
+TRACK_DIST_THRESH = 0.03  # 3cm
+
 class MarkerPoseProcessor:
     def __init__(self, robot):
 
@@ -23,12 +25,8 @@ class MarkerPoseProcessor:
         self.aruco_dict = aruco.getPredefinedDictionary(
             aruco.DICT_4X4_50
         )
-        if hasattr(cv2.aruco, "ArucoDetector"):
-            self.parameters = cv2.aruco.DetectorParameters()
-        else:
-            self.parameters = cv2.aruco.DetectorParameters_create()
-
-        # self.parameters = aruco.DetectorParameters_create()
+        self.parameters = cv2.aruco.DetectorParameters()        
+        self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.parameters)
 
         # Eye-in-hand calibration
         R_cam2gripper = np.array([
@@ -46,7 +44,7 @@ class MarkerPoseProcessor:
         self.T_cam2gripper[:3, 3] = t_cam2gripper
 
         # Recording buffer
-        self.buffer = []
+        self.buffer = {}
         self.buffer_size = 30
         self.recording = False
 
@@ -87,15 +85,11 @@ class MarkerPoseProcessor:
         frame = np.ascontiguousarray(frame)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.parameters)
-        corners, ids, _ = detector.detectMarkers(gray)
+        corners, ids, _ = self.detector.detectMarkers(gray)
 
         if ids is None:
             return
         
-        rvecs = []
-        tvecs = []
-
         # ArUco marker 3D 기준점 (marker_length 기준)
         objp = np.array([
             [-self.marker_length/2,  self.marker_length/2, 0],
@@ -103,8 +97,9 @@ class MarkerPoseProcessor:
             [ self.marker_length/2, -self.marker_length/2, 0],
             [-self.marker_length/2, -self.marker_length/2, 0],
         ], dtype=np.float32)
-        
+
         for i, corner in enumerate(corners):
+
             img_points = corner.reshape(4, 2).astype(np.float32)
 
             success, rvec, tvec = cv2.solvePnP(
@@ -115,19 +110,15 @@ class MarkerPoseProcessor:
                 flags=cv2.SOLVEPNP_IPPE_SQUARE
             )
 
-            if success:
-                rvecs.append(rvec)
-                tvecs.append(tvec)
+            if not success:
+                continue
 
-        rvecs = np.array(rvecs)
-        tvecs = np.array(tvecs)
-
-        for i in range(len(tvecs)):
             aruco.drawDetectedMarkers(frame, corners, ids)
-            cv2.drawFrameAxes(frame, self.camera_matrix, self.dist_coeffs, rvecs[i], tvecs[i], self.marker_length)
+            cv2.drawFrameAxes(frame, self.camera_matrix, self.dist_coeffs, rvec, tvec, self.marker_length)
+
+            # === 여기부터 기존 T 계산 그대로 ===
 
             # T_target2cam
-            rvec, tvec = rvecs[i], tvecs[i]
             t_target2cam = tvec.reshape(3, 1)
             R_target2cam, _ = cv2.Rodrigues(rvec)
 
@@ -150,47 +141,83 @@ class MarkerPoseProcessor:
             ).as_quat()
             
             x, y, z, qx, qy, qz, qw = (*pos, *quat)
+
             if self.recording:
-                self.buffer.append((*pos, *quat))
+
+                marker_id = int(ids[i][0])
+                matched_key = None
+                min_dist = float("inf")
+
+                # 기존 그룹 중 같은 ID 탐색
+                for key in self.buffer.keys():
+                    key_id, _ = key
+                    if key_id != marker_id:
+                        continue
+
+                    prev_pos = np.array(self.buffer[key][-1][:3])
+                    dist = np.linalg.norm(pos - prev_pos)
+
+                    if dist < min_dist:
+                        min_dist = dist
+                        matched_key = key
+
+                # threshold 이내면 같은 그룹
+                if matched_key is not None and min_dist < TRACK_DIST_THRESH:
+                    self.buffer[matched_key].append((*pos, *quat))
+
+                else:
+                    # 새 그룹 생성
+                    group_index = sum(1 for k in self.buffer if k[0] == marker_id)
+                    new_key = (marker_id, group_index)
+                    self.buffer[new_key] = [(*pos, *quat)]
+
 
             # 화면 표시용 텍스트
             cX, cY = int(corners[i][0][0][0]), int(corners[i][0][0][1])
             cv2.putText(frame, f"ID:{ids[i][0]} X={x:.3f}m Y={y:.3f}m Z={z:.3f}m", (cX, cY - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-            if self.recording and len(self.buffer) >= self.buffer_size:
+            if self.recording and self.is_ready():
                 self.recording = False
                 break
     # ======================================================
     # Result
     # ======================================================
     def is_ready(self):
-        return len(self.buffer) == self.buffer_size
+        for key in self.buffer:
+            if len(self.buffer[key]) >= self.buffer_size:
+                return True
+        return False
+    
+    def get_refined_poses(self):
 
-    def get_refined_pose(self):
-        # outlier 방어 (간단한 z-score)
-        data = np.array(self.buffer)
-        mean = np.mean(data[:, :3], axis=0)
-        std = np.std(data[:, :3], axis=0) + 1e-6
+        results = []
 
-        z_scores = np.abs((data[:, :3] - mean) / std)
-        mask = np.all(z_scores < 2.5, axis=1)
-        filtered = data[mask]
+        for key in list(self.buffer.keys()):
 
-        xs, ys, zs = filtered[:, 0], filtered[:, 1], filtered[:, 2]
+            if len(self.buffer[key]) >= self.buffer_size:
 
-        mean_x = float(np.mean(xs))
-        mean_y = float(np.mean(ys))
-        mean_z = float(np.mean(zs)) + 0.01
+                data = np.array(self.buffer[key])
+                mean = np.mean(data[:, :3], axis=0)
+                std = np.std(data[:, :3], axis=0) + 1e-6
 
-        pitch = math.pi / 2
-        yaw = math.atan2(mean_y, mean_x)
+                z_scores = np.abs((data[:, :3] - mean) / std)
+                mask = np.all(z_scores < 2.5, axis=1)
+                filtered = data[mask]
 
-        q = tf_transformations.quaternion_from_euler(
-            0.0, pitch, yaw
-        )
+                mean_xyz = np.mean(filtered[:, :3], axis=0)
 
-        # [ADDED] buffer clear는 여기서 책임
-        self.buffer.clear()
+                pitch = math.pi / 2
+                yaw = math.atan2(mean_xyz[1], mean_xyz[0])
 
-        return mean_x, mean_y, mean_z, *q
+                q = tf_transformations.quaternion_from_euler(
+                    0.0, pitch, yaw
+                )
+
+                marker_id, group_index = key
+                results.append((marker_id, group_index, *mean_xyz, *q))
+
+                self.buffer.pop(key)
+
+        return results
+
