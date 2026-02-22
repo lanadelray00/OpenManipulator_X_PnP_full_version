@@ -17,7 +17,8 @@ class MarkerPoseProcessor:
         
         self.camera_matrix = data['mtx']
         self.dist_coeffs = data['dist']
-        self.marker_length = 0.025
+        self.marker_length = 0.02
+        # self.marker_length = 0.025
 
         # ArUco
         self.aruco_dict = aruco.getPredefinedDictionary(

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#!/usr/bin/env python3
+import socket
 import rclpy
 from rclpy.node import Node
 import cv2
@@ -20,9 +20,9 @@ class PickAndPlaceNode(Node):
     }
 
     POSITION_OFFSET = {
-        "x": -0.01,
-        "y": 0.01,
-        "z": -0.01,
+        "x": -0.02,
+        "y": 0.00,
+        "z": 0.02,
     }
 
     def __init__(self):
@@ -54,15 +54,16 @@ class PickAndPlaceNode(Node):
         # Camera
         # ======================================================
         # cv2.setLogLevel(cv2.LOG_LEVEL_ERROR)
+        self.ip = self.get_local_ip()
+
         cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
-        # url = "http://192.168.0.105:5000/video_feed" # 집
-        url = "http://192.168.0.11:5000/video_feed" # 학원
+        # url = f"http://{self.ip}:5000/video_feed" # 집
+        url = f"http://{self.ip}:5000/video_feed" # 학원
 
         self.cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
-        
         ret, _ = self.cap.read()
         if not ret:
-            raise RuntimeError("Camera open failed!!!!")
+            raise RuntimeError(f"ip:{self.ip}, Camera open failed!!!!")
 
         self.camera_running = True
         threading.Thread(target=self.camera_loop, daemon=True).start()
@@ -82,6 +83,11 @@ class PickAndPlaceNode(Node):
             10
         )
 
+        self.done_pub = self.create_publisher(
+            Bool,
+            '/pick_and_place/done',
+            10
+        )
         # Notification
         self.get_logger().info("🟢 Pick & Place node started")
         self.get_logger().info("👉 Waiting for /pick_and_place/start trigger")
@@ -93,6 +99,18 @@ class PickAndPlaceNode(Node):
         # Startup motion (ASYNC)
         # ======================================================
         self.send_joint_pose(self.JOINT_POSES["ground_10"], next_stage=None)
+
+    # ======================================================
+    # ip finder
+    # ======================================================
+    def get_local_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("8.8.8.8", 80))  # 실제로 연결되지는 않음
+            self.ip = s.getsockname()[0]
+        finally:
+            s.close()
+        return self.ip
 
     # ======================================================
     # Trigger
@@ -199,6 +217,12 @@ class PickAndPlaceNode(Node):
 
         elif self.current_stage == "return":
             self.get_logger().info("🟢return")
+
+            # 🔵 done publish
+            msg = Bool()
+            msg.data = True
+            self.done_pub.publish(msg)
+
             self.send_joint_pose(
                 self.JOINT_POSES["ground_10"],
                 next_stage="done"
