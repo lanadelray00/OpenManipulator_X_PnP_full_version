@@ -19,12 +19,19 @@ class PickAndPlaceNode(Node):
         "placing_spot": [1.6199, 0.1427, 0.2102, 1.2471]
     }
 
+    # # 집
+    # POSITION_OFFSET = {
+    #     "x": -0.02,
+    #     "y": 0.00,
+    #     "z": 0.02,
+    # }
+    
+    # 학원
     POSITION_OFFSET = {
-        "x": -0.02,
+        "x": 0.00,
         "y": 0.00,
-        "z": 0.02,
+        "z": -0.02,
     }
-
     def __init__(self):
         super().__init__('Openmanipulator_pick_and_place_node')
 
