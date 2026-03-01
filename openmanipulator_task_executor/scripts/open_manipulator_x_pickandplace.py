@@ -16,7 +16,7 @@ class PickAndPlaceNode(Node):
     JOINT_POSES = {
         "ground_10": [0.0752, -1.1919, 0.4556, 1.6935],
         "pick_up": [0.0, -0.6, 0.3, 1.4],
-        "placing_spot": [1.6199, 0.1427, 0.2102, 1.2471]
+        "placing_spot": [1.5171, 0.6351, -0.0782, 0.9603]
     }
 
     # # 집
