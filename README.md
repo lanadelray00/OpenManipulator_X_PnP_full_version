@@ -1,8 +1,3 @@
-> **⚠️ Default branch: ROS 2 Humble**
->  
-> This `main` branch is based on **ROS 2 Humble Hawksbill**.  
-> For ROS 2 Jazzy, please switch to the `jazzy` branch.
-
 # 📌 Project Overview
 
 This repository implements an OpenManipulator-X Pick & Place system based on
@@ -10,15 +5,13 @@ ArUco Marker–based Hand-Eye Calibration and ROS 2 Action-based robot control.
 
 The system converts ArUco marker coordinates detected from a camera into the robot base frame using a calibrated hand-eye transformation, refines the target pose, and executes a Pick & Place scenario through a modular and extensible architecture.
 
-The core design goal is to decouple perception, coordinate processing, and robot execution, while enabling flexible task sequencing via ROS 2 Actions.
+The core design goal is to decouple perception and robot execution, while enabling flexible task sequencing via ROS 2 Actions.
 
 ## 🎥 Demo Video
 
 [![Pick & Place Demo](https://img.youtube.com/vi/JyPYKrjtD1M/maxresdefault.jpg)](https://www.youtube.com/watch?v=JyPYKrjtD1M)
 
 > Click the image to watch the full demo on YouTube.
-
-https://youtu.be/JyPYKrjtD1M
 
 ## ✅ Implementation Environment
 
