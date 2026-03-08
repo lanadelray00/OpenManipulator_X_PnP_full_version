@@ -12,7 +12,8 @@ The core design goal is to decouple perception and robot execution, while enabli
 [![Pick & Place Demo](https://img.youtube.com/vi/JyPYKrjtD1M/maxresdefault.jpg)](https://www.youtube.com/watch?v=JyPYKrjtD1M)
 
 > Click the image to watch the full demo on YouTube.
-
+https://youtu.be/JyPYKrjtD1M
+> 
 ## ✅ Implementation Environment
 
 OS: Ubuntu 22.04 LTS / Ubuntu 24.04 LTS
