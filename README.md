@@ -32,9 +32,6 @@ Camera : Logitech C270
 
 ## 🧩 Execution Instructions (RSBP & Control PC)
 
-## Prerequisite
-
-1. Set the same ROS domain ID on both the **control PC** and the **RSBP5** by adding the following line to `.bashrc` -> `export ROS_DOMAIN_ID=XX`
 
 ### Jazzy
 
@@ -59,6 +56,10 @@ rosdep install --from-paths src -y --ignore-src
  ' , instead of cloning ' <img width="872" height="105" alt="image" src="https://github.com/user-attachments/assets/bdf4b4c9-b80a-4d19-8b98-2f12ec8de09a" />
  ' , clone jazzy branch of this repository
 3. build the workspace with ```colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release```
+
+##### Common Setup
+Set the same ROS domain ID on both the control PC and the RSBP5 by adding the following line to `.bashrc` ->
+`export ROS_DOMAIN_ID=XX`
 
 Terminal Execution
 ```
