@@ -1,6 +1,6 @@
 # 📌 Project Overview
 
-This repository implements an OpenManipulator-X Pick & Place system based on
+This repository implements an **OpenManipulator-X Pick & Place system** based on
 ArUco Marker–based Hand-Eye Calibration and ROS 2 Action-based robot control.
 
 The system converts ArUco marker coordinates detected from a camera into the robot base frame using a calibrated hand-eye transformation, refines the target pose, and executes a Pick & Place scenario through a modular and extensible architecture.
@@ -58,8 +58,7 @@ rosdep install --from-paths src -y --ignore-src
 2. When you have reached ' <img width="319" height="40" alt="image" src="https://github.com/user-attachments/assets/3a5c93e2-c371-4442-bdf5-7c97a9d797f1" />
  ' , instead of cloning ' <img width="872" height="105" alt="image" src="https://github.com/user-attachments/assets/bdf4b4c9-b80a-4d19-8b98-2f12ec8de09a" />
  ' , clone jazzy branch of this repository
-3. Check the self.cap = cv2.VideoCapture('/dev/camera_c270') line in open_manipulator_x_pickandplace.py and update it to match your camera device.
-4. build the workspace with 'colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release'
+3. build the workspace with ```colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release```
 
 Terminal Execution
 ```
@@ -88,7 +87,7 @@ Abstracts low-level MoveIt control from task logic
 
 ### 2️⃣ robot_interface_client.py
 
-(Python | Action Client Wrapper)
+(Python | Action Client)
 
 Python interface for accessing the C++ Action Server
 
