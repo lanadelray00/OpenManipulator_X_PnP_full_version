@@ -34,7 +34,7 @@ Camera : Logitech C270
 
 ## Prerequisite
 
-1. Set the same ROS domain ID on both the **control PC** and the **RSBP5** by adding the following line to `.bashrc` , `export ROS_DOMAIN_ID=XX`
+1. Set the same ROS domain ID on both the **control PC** and the **RSBP5** by adding the following line to `.bashrc` -> `export ROS_DOMAIN_ID=XX`
 
 ### Jazzy
 
