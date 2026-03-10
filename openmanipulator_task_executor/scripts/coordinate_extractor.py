@@ -238,9 +238,6 @@ class ArucoVisionNode(Node):
         else:
             self.publish_empty_objects()
 
-        cv2.imshow("aruco_vision_debug", frame) # camera debuging test용
-        cv2.waitKey(1) # camera debuging test용
-
     # =========================================================
 
     def refine_pose(self, poses):
@@ -341,19 +338,9 @@ def main(args=None):
 
     node = ArucoVisionNode()
 
-    # rclpy.spin(node)
-    # node.destroy_node()
-    # rclpy.shutdown()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
     
-    #########################
-    # # camera debuging test용
-    try:
-        rclpy.spin(node)
-    finally:
-        node.cap.release()
-        cv2.destroyAllWindows()
-        node.destroy_node()
-        rclpy.shutdown()
-    #########################
 if __name__ == '__main__':
     main()
