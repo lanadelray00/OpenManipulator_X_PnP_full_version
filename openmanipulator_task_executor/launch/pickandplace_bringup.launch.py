@@ -32,15 +32,28 @@ def generate_launch_description():
         output='screen'
     )
 
+    coordinate_extractor_node = Node(
+        package='openmanipulator_task_executor',
+        executable='coordinate_extractor.py',
+        output='screen'
+    )
+
     # robot_interface가 뜬 다음 pick_and_place 실행
     start_pick_and_place_after_robot = RegisterEventHandler(
         OnProcessStart(
             target_action=robot_interface_node,
             on_start=[pick_and_place_node]
         )
+        )
+    start_coordinate_extractor_after_pick = RegisterEventHandler(
+        OnProcessStart(
+            target_action=pick_and_place_node,
+            on_start=[coordinate_extractor_node]
+        )
     )
 
     return LaunchDescription([
         robot_interface_node,
-        start_pick_and_place_after_robot
+        start_pick_and_place_after_robot,
+        start_coordinate_extractor_after_pick
     ])

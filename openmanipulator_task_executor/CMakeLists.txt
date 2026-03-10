@@ -102,6 +102,7 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scripts/open_manipulator_x_pickandplace.py
   scripts/keyboard_trigger_node.py
+  scripts/coordinate_extractor.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

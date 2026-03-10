@@ -14,21 +14,36 @@ find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # --------------------------------------------------
-# Service / Message Files
+# Action / Service / Message Files
 # --------------------------------------------------
-set(srv_files
-  "srv/RobotInterfaceMovetopose.srv"
-  "srv/RobotInterfaceOneString.srv"
-  "srv/RobotInterfaceBusy.srv"
-  )
-
-set(action_files
-  "action/MoveToPose.action"
-  "action/MoveToJointPose.action"
-  "action/MoveToNamed.action"
-  "action/GripperControl.action"
-  "action/EmergencyStop.action"
+# automatic add, intallation
+file(GLOB srv_files CONFIGURE_DEPENDS
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  "srv/*.srv"
 )
+
+file(GLOB action_files CONFIGURE_DEPENDS
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  "action/*.action"
+)
+
+file(GLOB msg_files CONFIGURE_DEPENDS
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  "msg/*.msg"
+)
+# set(srv_files
+#   "srv/RobotInterfaceMovetopose.srv"
+#   "srv/RobotInterfaceOneString.srv"
+#   "srv/RobotInterfaceBusy.srv"
+#   )
+
+# set(action_files
+#   "action/MoveToPose.action"
+#   "action/MoveToJointPose.action"
+#   "action/MoveToNamed.action"
+#   "action/GripperControl.action"
+#   "action/EmergencyStop.action"
+# )
 
 # --------------------------------------------------
 # Generate Interface Code
@@ -36,8 +51,9 @@ set(action_files
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${srv_files}
   ${action_files}
+  ${msg_files}
   DEPENDENCIES builtin_interfaces geometry_msgs
-  )
+)
 
 # --------------------------------------------------
 # Testing (optional)

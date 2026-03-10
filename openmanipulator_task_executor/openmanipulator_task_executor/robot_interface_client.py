@@ -1,4 +1,3 @@
-import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
 from action_msgs.msg import GoalStatus
@@ -51,11 +50,15 @@ class RobotInterfaceClient:
         )
 
         # ======================================================
-        # FK Service & JointState Subscription
+        # Service Clients
         # ======================================================
         self.fk_client = node.create_client(           # [MODIFIED]
             GetPositionFK, '/compute_fk'
         )
+
+        # ======================================================
+        # Topic Subscription
+        # ======================================================
         self.subscription = node.create_subscription(  # [MODIFIED]
             JointState, '/joint_states',
             self.joint_callback, 10
