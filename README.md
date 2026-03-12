@@ -8,10 +8,10 @@ The core design goal is to **decouple perception from robot execution**, while e
 
 ## 🎥 Demo Video
 
-[![Pick & Place Demo](https://img.youtube.com/vi/JyPYKrjtD1M/maxresdefault.jpg)](https://www.youtube.com/watch?v=JyPYKrjtD1M)
+[![Pick & Place Demo](https://img.youtube.com/vi/JyPYKrjtD1M/maxresdefault.jpg)]([https://www.youtube.com/watch?v=JyPYKrjtD1M](https://youtube.com/shorts/M9DBwQ9MoKU))
 
 > Click the image to watch the full demo on YouTube.
-https://youtu.be/JyPYKrjtD1M
+[https://youtu.be/JyPYKrjtD1M](https://youtube.com/shorts/M9DBwQ9MoKU)
 
 ## ✅ Pick & Place Workflow
 > 
