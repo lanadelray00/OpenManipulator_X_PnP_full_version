@@ -1,11 +1,10 @@
 # 📌 Project Overview
 
-This repository implements an **OpenManipulator-X Pick & Place system** based on
-ArUco Marker–based Hand-Eye Calibration and ROS 2 Action-based robot control.
+This repository implements an **OpenManipulator-X Pick-and-Place** system based on ArUco marker–based eye-in-hand calibration, using the MoveIt 2 API and ROS 2 action-based robot control.
 
-The system converts ArUco marker coordinates detected from a camera into the robot base frame using a calibrated hand-eye transformation, refines the target pose, and executes a Pick & Place scenario through a modular and extensible architecture.
+The system converts ArUco marker coordinates detected from a camera into the robot base frame using a calibrated hand-eye transformation, refines the target pose, and executes a Pick & Place scenario.
 
-The core design goal is to decouple perception and robot execution, while enabling flexible task sequencing via ROS 2 Actions.
+The core design goal is to **decouple perception from robot execution**, while enabling flexible task sequencing through a state-machine-based control flow and ROS 2 Action-based robot execution.
 
 ## 🎥 Demo Video
 
@@ -13,25 +12,32 @@ The core design goal is to decouple perception and robot execution, while enabli
 
 > Click the image to watch the full demo on YouTube.
 https://youtu.be/JyPYKrjtD1M
+
+## ✅ Pick & Place Workflow
 > 
+> 
+
+
+## ✅ Pick & Place System Function
+> 
+> 
+> 
+
 ## ✅ Implementation Environment
 
-OS: Ubuntu 24.04 LTS
-
-ROS 2: Jazzy
-
-Language: Python + Cpp
-
-Motion Planning: MoveIt 2
-
-Manipulator : OpenManipulator-X
-
-Camera : Logitech C270
-
-
+> OS: Ubuntu 24.04 LTS
+>
+> ROS 2: Jazzy
+>
+> Language: Python + Cpp
+>
+> Motion Planning: MoveIt 2
+>
+> Manipulator : OpenManipulator-X
+>
+> Camera : Logitech C270
 
 ## 🧩 Execution Instructions (RSBP & Control PC)
-
 
 ### Jazzy
 
@@ -59,7 +65,7 @@ rosdep install --from-paths src -y --ignore-src
 
 ##### Common Setup
 Set the same ROS domain ID on both the control PC and the RSBP5 by adding the following line to `.bashrc` ->
-`export ROS_DOMAIN_ID=XX`
+7`export ROS_DOMAIN_ID=XX`
 
 Terminal Execution
 ```
@@ -78,80 +84,136 @@ ros2 launch openmanipulator_task_executor keyboard_trigger_node.py
 
 (C++ | Action Server)
 
-Implements a ROS 2 Action Server using MoveGroupInterface
+Wraps the MoveIt 2 MoveGroupInterface API into a dedicated ROS 2 node by exposing only the motion and gripper functions required for the Pick & Place task.
 
-Provides a high-level robot control interface (IK solving, motion planning, execution)
+Implements these functions as ROS 2 Action Servers so that higher-level task nodes can send sequential motion requests and execute continuous Pick & Place behaviors in a structured way.
 
-Designed as a reusable backend for various task scenarios
-
-Abstracts low-level MoveIt control from task logic
+Separates low-level robot execution from task-level logic.
 
 ### 2️⃣ robot_interface_client.py
 
-(Python | Action Client)
+(Python | Non-Node Action Client Helper)
 
-Python interface for accessing the C++ Action Server
+Provides a Python helper class for accessing the robot_interface action server from higher-level task nodes.
 
-Provides easy-to-use methods for motion requests
+This class is not a ROS node itself.
+Instead, it is imported and used inside the main Pick & Place node, which owns the actual ROS node context.
 
-Enables Python-based task nodes to control the manipulator without direct MoveIt dependency
+Its purpose is to let Python-based task logic interact with the C++ motion backend in a simple and reusable way, while keeping action, service, and state-handling code separate from the main task flow.
 
-### 3️⃣ ArUco_coord_extractor.py
+Although these methods could have been implemented directly inside the main Pick & Place node, they were separated into this file to improve readability, modularity, and maintainability.
 
-(Perception & Coordinate Processing)
+Main Methods
 
-Detects ArUco markers from the camera image
+* send_move_to_pose() — sends a Cartesian pose goal
 
-Applies Hand-Eye Calibration transformation matrix
+* send_move_to_named() — sends a named target goal
 
-Converts camera coordinates into the robot base frame
+* send_move_to_joint_pose() — sends a joint-space goal
 
-Outputs refined target poses independent of perception source
-(Designed for easy replacement with YOLO, AprilTag, etc.)
+* send_gripper() — sends a gripper command
+
+* send_emergency_stop() — sends an emergency stop command
+
+* joint_callback() — requests FK from current joint states
+
+* fk_response_callback() — updates cached end-effector pose
+
+Acts as a bridge between the Python task node and the C++ robot control backend, improving readability and maintainability.
+
+
+### 3️⃣ coordinate_extractor.py
+
+(Python | Perception, Object Tracking, and Pose Refinement Node)
+
+Detects ArUco markers from the camera stream, converts their poses into the robot base frame using the hand-eye calibration transform, refines the coordinates for stable robot execution, and publishes the final target poses to the Pick & Place node.
+
+This node was designed not just to detect markers, but to generate robot-usable target poses from noisy visual input through tracking, filtering, and pose refinement.
+
+**Main Responsibilities**
+
+1. Detects multiple ArUco markers from the live camera stream
+2. Estimates marker poses with solvePnP
+3. Transforms camera-frame poses into the robot base frame using hand-eye calibration
+4. Refines target poses through **multi-frame buffering, Z-score–based outlier removal, stability checks, and task-oriented orientation generation for reliable Pick & Place execution**.
+5. Publishes refined object poses through /aruco/refined_objects
+
+**Key Design Points**
+* Supports multiple-object tracking, including separate handling of objects that share the same ArUco ID
+
+* Buffers object poses over multiple frames for temporal tracking (up to 60 frames per object, with tracked objects cleared after 20 consecutive missed frames)
+
+* (targets are rejected if the filtered positional standard deviation is greater than 0.005 m on x, y, or z)
+
+* Generates grasp-oriented target orientation for robot execution instead of using raw marker orientation directly
+
+Converts raw ArUco detections into stable and robot-executable target poses for Pick & Place.
+
 
 ### 4️⃣ open_manipulator_x_pickandplace.py
 
-(Main Task Node)
+(Python | Main Pick & Place Task Node)
 
-Receives refined target coordinates
+Implements the main Pick & Place task logic as a ROS 2 node.
 
-Executes the Pick & Place scenario using robot_interface_client
+This node receives refined target poses from the **coordinate extractor**, sends motion and gripper requests through **robot_interface_client**, and executes the full Pick & Place sequence using a finite-state-machine-based control flow.
 
-Encapsulates task logic separately from robot control and perception
+**Main Responsibilities**
 
-Acts as the main orchestrator of the system
+1. Receives refined object poses from /aruco/refined_objects
+2. Starts task execution from /pick_and_place/start
+3. Executes the Pick & Place sequence through staged FSM logic
+4. Sends motion and gripper commands via robot_interface_client
+5. Applies position offsets before executing the pick motion
+6. Publishes completion signals through /pick_and_place/done
+7. Supports repeated execution through auto-run mode
+
+**Pick & Place Sequence**
+'idle - pick_open - pick - grip - lift - place - release - return - done - idle'
+
+Acts as the main task orchestrator that connects refined perception output to sequential robot execution.
+
 
 ### 5️⃣ keyboard_trigger_node.py
 
-(Trigger Node)
+(Python | Execution Trigger Node)
 
-Publishes topic-based triggers to start task execution
+Publishes a trigger message to start or stop the main Pick & Place task node.
 
-Allows manual control of task flow (start / retry / sequencing)
+When turned on, it enables continuous Pick & Place execution as long as valid objects are detected.
+When turned off, it disables task execution so that Pick & Place does not run even if objects are detected.
 
-Designed to be replaceable with external UI or higher-level planners
 
 ### 🧩 Key Features
 
 ✔ ROS 2 Action-based task execution
 
+✔ Python–C++ bridge structure for task-level robot control
+
 ✔ MoveIt MoveGroupInterface–based robot control
 
-✔ ArUco Marker–based Hand-Eye Calibration
+✔ FSM-based Pick & Place task execution with auto-run control
 
-✔ Camera → Base frame coordinate transformation
+✔ ArUco marker–based hand-eye calibration
 
-✔ Modular and extensible architecture
+✔ Multi-object tracking, including separate handling of duplicate ArUco IDs
 
-✔ Perception-independent coordinate interface
+✔ Multi-frame pose refinement with outlier rejection and stability checks
+
 
 ### 🎯 Design Philosophy
 
 Separation of concerns
-(Perception / Coordinate Processing / Motion Control / Task Logic)
+(Perception / Pose Refinement / Motion Backend / Task Logic / Execution Trigger)
 
-Action-based execution for continuous and interruptible tasks
+Action-based robot execution
+for structured sequential motions and reusable task control
 
-Future-proof structure for perception method replacement
+Robot-usable perception output
+by refining noisy visual detections into stable Pick & Place target poses
 
-Practical robot application focus, not demo-level scripts
+Modular Python–C++ integration
+for readability, maintainability, and easier system extension
+
+Practical system design
+focused on repeatable real-robot execution rather than one-shot demo scripts
