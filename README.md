@@ -7,11 +7,11 @@ The system converts ArUco marker coordinates detected from a camera into the rob
 The core design goal is to **decouple perception from robot execution**, while enabling flexible task sequencing through a state-machine-based control flow and ROS 2 Action-based robot execution.
 
 ## 🎥 Demo Video
-
-[![Pick & Place Demo](https://img.youtube.com/vi/JyPYKrjtD1M/maxresdefault.jpg)]([https://www.youtube.com/watch?v=JyPYKrjtD1M](https://youtube.com/shorts/M9DBwQ9MoKU))
+[![Pick & Place Demo](https://img.youtube.com/vi/JyPYKrjtD1M/maxresdefault.jpg)](https://youtube.com/shorts/M9DBwQ9MoKU)
 
 > Click the image to watch the full demo on YouTube.
 [https://youtu.be/JyPYKrjtD1M](https://youtube.com/shorts/M9DBwQ9MoKU)
+> 
 
 ## ✅ Pick & Place Workflow
 > 
