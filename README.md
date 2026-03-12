@@ -14,14 +14,24 @@ The core design goal is to **decouple perception from robot execution**, while e
 > 
 
 ## ✅ Pick & Place Workflow
-> 
-> 
+
+> 1. Detect ArUco markers from the camera stream
+> 2. Extract marker poses and transform them into the robot base frame
+> 3. Refine target poses through tracking and filtering
+> 4. Publish refined object poses to the Pick & Place node
+> 5. Trigger the Pick & Place task
+> 6. Execute the sequence: open gripper → pick → grip → lift → place → release → return
+> 7. Repeat the cycle while auto-run is enabled and valid objects are detected
+
 
 
 ## ✅ Pick & Place System Function
-> 
-> 
-> 
+> * Camera-to-base pose transformation
+> * Multi-object tracking with duplicate ID handling
+> * Pose refinement through buffering, filtering, and stability checks
+> * ROS 2 Action-based task execution
+> * FSM-based Pick & Place execution
+> * Trigger-based continuous auto-run control
 
 ## ✅ Implementation Environment
 
