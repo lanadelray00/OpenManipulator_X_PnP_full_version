@@ -47,7 +47,7 @@ The core design goal is to **decouple perception from robot execution**, while e
 >
 > Camera : Logitech C270
 
-## 🧩 Execution Instructions (RSBP & Control PC)
+## 🧩 Execution Instructions (Control PC)
 
 ### Quick Start Guide
 1. Install ros-jazzy-desktop and ros-dev-tools on the control pc
