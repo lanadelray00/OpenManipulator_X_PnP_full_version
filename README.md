@@ -50,8 +50,8 @@ The core design goal is to **decouple perception from robot execution**, while e
 ## 🧩 Execution Instructions (Control PC)
 
 ### Quick Start Guide
-1. Install ros-jazzy-desktop and ros-dev-tools on the control pc
-2. Set the same ROS domain ID on `.bashrc` -> `export ROS_DOMAIN_ID=XX`
+1. Install `ros-jazzy-desktop` and `ros-dev-tools` on the control PC
+2. Set the same ROS domain ID in `.bashrc` : `export ROS_DOMAIN_ID=XX`
 3. Set USB Port Permissions ```sudo usermod -aG dialout $USER```
 4. Clone the Repository (main branch)
 5. Install ROS2 Dependencies (run in the workspace root)
@@ -61,10 +61,10 @@ rosdep update
 rosdep install --from-paths src -y --ignore-src
 ```
 6. Check and align the versions of OpenCV (4.13.0.92), NumPy (1.26.4), SciPy (1.11.4), transforms3d (0.4.1), and Flask (3.1.2)
-7. Build the Package ```colcon build```
-8. Source the workspace ex) ```source ~/ros2_ws/install/setup.bash```
+7. Build the Workspace ```colcon build```
+8. Source the Workspace : ```source ~/ros2_ws/install/setup.bash```
 9. Create and apply udev rules ```ros2 run open_manipulator_bringup om_create_udev_rules```
-10. Check the current latency with following command (should be 1) ```cat /sys/bus/usb-serial/devices/ttyUSB0/latency_timer```
+10. Check the current USB latency with following command (should be 1) ```cat /sys/bus/usb-serial/devices/ttyUSB0/latency_timer```
 11. Configure udev rules to assign persistent device names to the USB camera (/dev/camera_c270) and the OpenManipulator port (/dev/ttyDYNAMIXEL).
 
 ### Terminal Execution
