@@ -1,3 +1,8 @@
+> # ⚠️ This Branch is for RSBP5
+>  
+> This `jazzy-rsbp5` branch is intended for RSBP5.  
+> For Control PC Jazzy version, please switch to the `jazzy` branch.
+
 # 📌 Project Overview
 
 This repository implements an **OpenManipulator-X Pick-and-Place** system based on ArUco marker–based eye-in-hand calibration, using the MoveIt 2 API and ROS 2 action-based robot control.
@@ -47,13 +52,13 @@ The core design goal is to **decouple perception from robot execution**, while e
 >
 > Camera : Logitech C270
 
-## 🧩 Execution Instructions (Control PC)
+## 🧩 Execution Instructions (RSBP5)
 
 ### Quick Start Guide
-1. Install `ros-jazzy-desktop` and `ros-dev-tools` on the control PC
+1. Install `ros-jazzy-desktop` and `ros-dev-tools` on your rsbp5
 2. Set the same ROS domain ID in `.bashrc` : `export ROS_DOMAIN_ID=XX`
 3. Set USB Port Permissions ```sudo usermod -aG dialout $USER```
-4. Clone the Repository (main branch)
+4. Clone the Repository (jazzy-rsbp5 branch)
 5. Install ROS2 Dependencies (run in the workspace root)
 ```
 sudo rosdep init 
