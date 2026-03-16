@@ -49,43 +49,28 @@ The core design goal is to **decouple perception from robot execution**, while e
 
 ## 🧩 Execution Instructions (RSBP & Control PC)
 
-### Jazzy
-
-##### RSBP5
-1. Install ros-jazzy-ros-desktop and ros-dev-tools on the RSBP5 and clone jazzy-rsbp5 branch
-2. To enable communication with the hardware, add your user to the dialout group
-```sudo usermod -aG dialout $USER```
-3. Install ROS 2 Dependencies (run in the workspace root)
+### Quick Start Guide
+1. Install ros-jazzy-desktop and ros-dev-tools on the control pc
+2. Set the same ROS domain ID on `.bashrc` -> `export ROS_DOMAIN_ID=XX`
+3. Set USB Port Permissions ```sudo usermod -aG dialout $USER```
+4. Clone the Repository (main branch)
+5. Install ROS2 Dependencies (run in the workspace root)
 ```
 sudo rosdep init 
 rosdep update
 rosdep install --from-paths src -y --ignore-src
 ```
-4. Build the Package ```colcon build```
-5. Source the workspace ```source ~/ros2_ws/install/setup.bash```
-6. Create and apply udev rules ```ros2 run open_manipulator_bringup om_create_udev_rules```
-7. Check the current latency with following command (should be 1) ```cat /sys/bus/usb-serial/devices/ttyUSB0/latency_timer```
-   
-##### Control PC
-1. Install ros-jazzy-desktop and ros-dev-tools on the control pc and set up the OpenManipulator packages by following the official guide:https://emanual.robotis.com/docs/en/platform/openmanipulator_x/quick_start_guide/#setup
-2. When you have reached ' <img width="319" height="40" alt="image" src="https://github.com/user-attachments/assets/3a5c93e2-c371-4442-bdf5-7c97a9d797f1" />
- ' , instead of cloning ' <img width="872" height="105" alt="image" src="https://github.com/user-attachments/assets/bdf4b4c9-b80a-4d19-8b98-2f12ec8de09a" />
- ' , clone jazzy branch of this repository
-3. build the workspace with ```colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release```
+6. Check and align the versions of OpenCV (4.13.0.92), NumPy (1.26.4), SciPy (1.11.4), transforms3d (0.4.1), and Flask (3.1.2)
+7. Build the Package ```colcon build```
+8. Source the workspace ex) ```source ~/ros2_ws/install/setup.bash```
+9. Create and apply udev rules ```ros2 run open_manipulator_bringup om_create_udev_rules```
+10. Check the current latency with following command (should be 1) ```cat /sys/bus/usb-serial/devices/ttyUSB0/latency_timer```
+11. Configure udev rules to assign persistent device names to the USB camera (/dev/camera_c270) and the OpenManipulator port (/dev/ttyDYNAMIXEL).
 
-##### Common Setup
-Set the same ROS domain ID on both the control PC and the RSBP5 by adding the following line to `.bashrc` ->
-7`export ROS_DOMAIN_ID=XX`
-
-Terminal Execution
+### Terminal Execution
 ```
-# RSBP5
-ros2 launch open_manipulator_bringup open_manipulator_x.launch.py
-
-# Control PC
-ros2 launch open_manipulator_moveit_config open_manipulator_x_moveit.launch.py
-ros2 launch openmanipulator_task_executor pickandplace_bringup.launch.py
-ros2 launch openmanipulator_task_executor keyboard_trigger_node.py
+ros2 launch open_manipulator_bringup rsbp_full_bringup.launch.py # Launch the full bringup pipeline
+ros2 launch openmanipulator_task_executor keyboard_trigger_node.py # Trigger for Pick & Place execution
 ```
 
 ## 🧠 System Architecture
