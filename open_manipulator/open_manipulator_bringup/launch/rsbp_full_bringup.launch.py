@@ -40,7 +40,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        open_manipulator_launch,
+        # open_manipulator_launch,
         moveit_launch,
         pick_and_place_launch,
     ])

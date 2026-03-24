@@ -18,7 +18,7 @@ class PickAndPlaceNode(Node):
     POSITION_OFFSET = {
         "x": -0.01,
         "y": 0.00,
-        "z": 0.00,
+        "z": 0.05,
     }
 
     def __init__(self):

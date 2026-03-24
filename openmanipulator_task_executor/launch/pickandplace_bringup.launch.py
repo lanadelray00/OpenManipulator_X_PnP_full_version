@@ -34,7 +34,7 @@ def generate_launch_description():
 
     coordinate_extractor_node = Node(
         package='openmanipulator_task_executor',
-        executable='coordinate_extractor.py',
+        executable='coordinate_extractor_eyetohand.py',
         output='screen'
     )
 

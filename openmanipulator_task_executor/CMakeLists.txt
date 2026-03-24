@@ -103,6 +103,7 @@ install(PROGRAMS
   scripts/open_manipulator_x_pickandplace.py
   scripts/keyboard_trigger_node.py
   scripts/coordinate_extractor.py
+  scripts/coordinate_extractor_eyetohand.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
